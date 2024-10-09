@@ -30,7 +30,7 @@ public class HashCache {
     }
 
     public String getHash() {
-        if (queue.size() / (capacity / 100.0) < minFillPercent) {
+        if (((double) queue.size() / capacity) * 100.0 < minFillPercent) {
             if (isGenerating.compareAndSet(false, true)) {
                 hashGenerator.getBatch();
                 hashGenerator.getBatchAsync().thenAccept(queue::addAll);
