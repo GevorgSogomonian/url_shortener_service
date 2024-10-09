@@ -24,7 +24,7 @@ public class HashGenerator {
 
 
     @Transactional
-    public void generatedBatch() {
+    public void generateBatch() {
         List<Long> generatedNumbers = hashRepository.getUniqueNumbers(batchSize);
         List<Hash> hashes = base62Encoder.encode(generatedNumbers).stream().map(string ->
                 Hash.builder().hash(string).build()).collect(Collectors.toList());
@@ -35,7 +35,7 @@ public class HashGenerator {
     public List<Hash> getBatch() {
         List<Hash> hashes = hashRepository.getAndDeleteHashBatch(batchSize);
         if (hashes.size() < batchSize) {
-            generatedBatch();
+            generateBatch();
             hashes.addAll(hashRepository.getAndDeleteHashBatch(batchSize - hashes.size()));
         }
         return hashes;

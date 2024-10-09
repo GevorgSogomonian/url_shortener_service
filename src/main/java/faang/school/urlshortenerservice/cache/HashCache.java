@@ -41,7 +41,7 @@ public class HashCache {
     }
 
     public void fillingQueue() {
-        hashGenerator.generatedBatch();
+        hashGenerator.generateBatch();
         queue.addAll(hashGenerator.getBatch());
     }
 }
