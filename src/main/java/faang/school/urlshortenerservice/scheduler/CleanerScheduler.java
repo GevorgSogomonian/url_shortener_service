@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class CleanerScheduler {
     private final UrlService urlService;
 
-    @Transactional
     @Scheduled(cron = "${url.cleaner.scheduler}")
     public void cleanOldUrl(){
         urlService.deleteOldUrls();
