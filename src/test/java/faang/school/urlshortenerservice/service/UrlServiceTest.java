@@ -22,8 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-;
-
 @ExtendWith(MockitoExtension.class)
 public class UrlServiceTest {
     @InjectMocks
@@ -36,11 +34,12 @@ public class UrlServiceTest {
     private UrlCacheRepository urlCacheRepository;
     @Mock
     private HashRepository hashRepository;
+
     private Url url;
     private UrlDtoRequest urlDtoRequest;
     private String hash;
-
     private String urlPrefix;
+    private String shortUrl;
 
     @BeforeEach
     void init() {
@@ -53,15 +52,17 @@ public class UrlServiceTest {
                 .url(urlString)
                 .hash(hash)
                 .build();
+        shortUrl = urlPrefix + hash;
         urlPrefix = "http://exampele.com/";
         urlService.setUrlPrefix(urlPrefix);
     }
 
     @Test
     void getShortUrlTest() {
-        String shortUrl = urlPrefix + hash;
         when(hashCache.getHash()).thenReturn(hash);
+
         String actual = urlService.getShortUrl(urlDtoRequest);
+
         verify(urlRepository).save(any());
         verify(urlCacheRepository).saveUrlByHash(hash, urlDtoRequest.getUrl());
         assertNotNull(actual);
@@ -71,7 +72,9 @@ public class UrlServiceTest {
     @Test
     void getUrlFormHashFromCashTest() {
         when(urlCacheRepository.getUrlByHash(hash)).thenReturn(Optional.of(url.getUrl()));
+
         String actual = urlService.getUrlFromHash(hash);
+
         assertEquals(url.getUrl(), actual);
         verify(urlCacheRepository).getUrlByHash(hash);
 
@@ -81,7 +84,9 @@ public class UrlServiceTest {
     void getUrlFromHashFromRepositoryTest() {
         when(urlCacheRepository.getUrlByHash(hash)).thenReturn(Optional.empty());
         when(urlRepository.findById(hash)).thenReturn(Optional.of(url));
+
         String actual = urlService.getUrlFromHash(hash);
+
         assertEquals(url.getUrl(), actual);
         verify(urlCacheRepository).getUrlByHash(hash);
         verify(urlRepository).findById(hash);
@@ -91,6 +96,7 @@ public class UrlServiceTest {
     void getUrlFromRepositoryNotFoundTest() {
         when(urlCacheRepository.getUrlByHash(hash)).thenReturn(Optional.empty());
         when(urlRepository.findById(hash)).thenReturn(Optional.empty());
+
         assertThrows(EntityNotFoundException.class, () -> urlService.getUrlFromHash(hash));
     }
 
@@ -99,7 +105,9 @@ public class UrlServiceTest {
         LocalDateTime fromDate = LocalDateTime.now().minusYears(1L);
         List<String> hashes = List.of("A", "B", "C", "D", "E", "F");
         when(urlRepository.removeOldUrlAndGetHashes(any(LocalDateTime.class))).thenReturn(hashes);
+
         urlService.deleteOldUrls();
+
         verify(urlRepository, times(1)).removeOldUrlAndGetHashes(any(LocalDateTime.class));
         verify(hashRepository, times(1)).saveAll(anyCollection());
     }
