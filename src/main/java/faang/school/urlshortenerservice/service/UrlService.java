@@ -22,7 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UrlService {
     private final UrlRepository urlRepository;
-    private final HashCache hashCash;
+    private final HashCache hashCache;
     private final UrlCacheRepository urlCacheRepository;
     private final HashRepository hashRepository;
     @Value("${hash.url_prefix}")
@@ -31,7 +31,7 @@ public class UrlService {
 
     @Transactional
     public String getShortUrl(UrlDtoRequest request) {
-        String hash = hashCash.getHash();
+        String hash = hashCache.getHash();
         saveShortUrl(hash, request);
         return urlPrefix + hash;
     }
